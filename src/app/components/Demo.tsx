@@ -2,12 +2,12 @@
 
 import { ReactNode, useState } from "react";
 import { isAddress } from "viem";
-import { fromUnits, getDaysFromSeconds, printNumber } from "../lib/numbers";
 import { useBorrowData } from "../lib/useBorrowData";
+import { fromUnits, getDaysFromSeconds, printNumber } from "../lib/utils";
 import { BorrowButton } from "./BorrowButton";
 
 export function Demo() {
-  const [poolAddress, setPoolAddress] = useState("0x8c845a2c51e361d3835c7f2f214e03305582ed0a");
+  const [poolAddress, setPoolAddress] = useState("0x929d2634dde48e7ae5aae8ba444fdaa8eefdea37");
   const [tokenId, setTokenId] = useState("");
 
   const { data, error } = useBorrowData({ poolAddress, tokenId });

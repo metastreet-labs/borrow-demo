@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { POOL_ABI } from "../lib/abi";
 import { BorrowOption } from "../lib/getBorrowOptions";
 import { Pool } from "../lib/getPool";
-import { FixedPoint } from "../lib/numbers";
+import { FixedPoint } from "../lib/utils";
 import { wagmiConfig } from "./Providers";
 
 type BorrowButtonProps = {
@@ -64,7 +64,7 @@ export function BorrowButton(props: BorrowButtonProps) {
         pool.collateralToken.id,
         BigInt(tokenId),
         /* down scaling required here too, must round "up" */
-        FixedPoint.scaleDown(maxRepayment, decimals, "up"),
+        FixedPoint.scaleDown(maxRepayment, FixedPoint.DECIMALS - decimals, "up"),
         nodes,
         encodePacked(["uint16", "uint16", "bytes"], [5, size(oracleContext), oracleContext]),
       ],

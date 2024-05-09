@@ -1,7 +1,9 @@
 import { Big } from "big.js";
-import { formatUnits, parseUnits } from "viem";
+import { Address, formatUnits, isAddress, parseUnits } from "viem";
+import { z } from "zod";
 
 /* Fixed Point */
+
 const DECIMALS = 18;
 
 function scale(decimals: number) {
@@ -27,7 +29,7 @@ function div(a: bigint, b: bigint, decimals = 18) {
 
 export const FixedPoint = { scaleUp, scaleDown, mul, div, DECIMALS };
 
-/* */
+/* number utils */
 
 export function fromUnits(u: bigint, decimals = DECIMALS) {
   return new Big(formatUnits(u, decimals));
@@ -44,3 +46,12 @@ export function printNumber(n: Big) {
 export function getDaysFromSeconds(seconds: number) {
   return Math.floor(seconds / 86400);
 }
+
+/* zod */
+
+export const zodAddress = z
+  .string()
+  .refine((s) => isAddress(s))
+  .transform((s) => s.toLowerCase() as Address);
+
+export const zodStringToBigInt = z.string().transform((s) => BigInt(s));

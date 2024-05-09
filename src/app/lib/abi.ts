@@ -17,6 +17,47 @@ export const POOL_ABI = [
     stateMutability: "view",
   },
   {
+    inputs: [],
+    name: "InvalidLength",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidQuote",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidShortString",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidSignature",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidSigner",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidTimestamp",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "str",
+        type: "string",
+      },
+    ],
+    name: "StringTooLong",
+    type: "error",
+  },
+  {
     type: "function",
     inputs: [
       { name: "principal", internalType: "uint256", type: "uint256" },
@@ -30,5 +71,91 @@ export const POOL_ABI = [
     name: "borrow",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "nonpayable",
+  },
+  {
+    inputs: [],
+    name: "InactiveLiquidity",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InsufficientLiquidity",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InsufficientShares",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InsufficientTickSpacing",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidBorrowOptions",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidCaller",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidCollateralFilterParameters",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidInterestRateModelParameters",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidLoanReceipt",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidParameters",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidRedemptionStatus",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidTick",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "LoanNotExpired",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "RepaymentTooHigh",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "index",
+        type: "uint256",
+      },
+    ],
+    name: "UnsupportedCollateral",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "UnsupportedLoanDuration",
+    type: "error",
   },
 ] as const;

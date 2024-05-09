@@ -1,8 +1,9 @@
 "use server";
 
 import { GraphQLClient, gql } from "graphql-request";
-import { Address, isAddress } from "viem";
+import { Address } from "viem";
 import { z } from "zod";
+import { zodAddress, zodStringToBigInt } from "./utils";
 
 const SUBGRAPH_URL = `${process.env["SUBGRAPH_URL"]}`;
 
@@ -32,12 +33,6 @@ const POOL_QUERY = gql`
     }
   }
 `;
-
-const zodAddress = z
-  .string()
-  .refine((s) => isAddress(s))
-  .transform((s) => s.toLowerCase() as Address);
-const zodStringToBigInt = z.string().transform((s) => BigInt(s));
 
 const POOL_SCHEMA = z.object({
   id: zodAddress,
