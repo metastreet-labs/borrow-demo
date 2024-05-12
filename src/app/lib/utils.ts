@@ -1,5 +1,5 @@
 import { Big } from "big.js";
-import { Address, formatUnits, isAddress, parseUnits } from "viem";
+import { Address, Hex, formatUnits, isAddress, isHex, parseUnits } from "viem";
 import { z } from "zod";
 
 /* Fixed Point */
@@ -20,11 +20,11 @@ function scaleDown(n: bigint, decimals: number, rounding: "up" | "down" = "down"
 }
 
 function mul(a: bigint, b: bigint, decimals = DECIMALS) {
-  scaleDown(a * b, decimals);
+  return scaleDown(a * b, decimals);
 }
 
 function div(a: bigint, b: bigint, decimals = 18) {
-  scaleUp(a, decimals) / b;
+  return scaleUp(a, decimals) / b;
 }
 
 export const FixedPoint = { scaleUp, scaleDown, mul, div, DECIMALS };
@@ -51,7 +51,14 @@ export function getDaysFromSeconds(seconds: number) {
 
 export const zodAddress = z
   .string()
-  .refine((s) => isAddress(s))
+  .refine(isAddress)
   .transform((s) => s.toLowerCase() as Address);
 
+export const zodHex = z
+  .string()
+  .refine(isHex)
+  .transform((s) => s as Hex);
+
 export const zodStringToBigInt = z.string().transform((s) => BigInt(s));
+
+export const zodStringToNumber = z.string().transform((s) => parseInt(s));

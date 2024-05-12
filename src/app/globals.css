@@ -6,3 +6,11 @@
 input {
   @apply border p-1;
 }
+
+h2 {
+  @apply text-2xl font-semibold;
+}
+
+.button {
+  @apply bg-black text-white p-4;
+}

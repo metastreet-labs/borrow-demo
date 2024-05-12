@@ -3,7 +3,7 @@
 import { GraphQLClient, gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
-import { zodAddress, zodStringToBigInt } from "./utils";
+import { zodAddress, zodStringToBigInt } from "../utils";
 
 const SUBGRAPH_URL = `${process.env["SUBGRAPH_URL"]}`;
 

@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import { Address, isAddress } from "viem";
 import { wagmiConfig } from "../components/Providers";
-import { POOL_ABI } from "../lib/abi";
 import { getBorrowOptions } from "../lib/getBorrowOptions";
 import { getOracleContext } from "../lib/getOracleContext";
-import { getPool } from "../lib/getPool";
+import { SSPO_ABI } from "./abis/SimpleSignedPriceOracle";
+import { getPool } from "./subgraph/getPool";
 import { FixedPoint } from "./utils";
 
 type UseBorrowOptionsParams = {
@@ -27,7 +27,7 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
 
       const price = await readContract(wagmiConfig, {
         address: pool.id,
-        abi: POOL_ABI,
+        abi: SSPO_ABI,
         functionName: "price",
         args: [
           pool.collateralToken.id,

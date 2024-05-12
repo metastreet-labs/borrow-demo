@@ -1,5 +1,5 @@
 import { TickRouter } from "@metastreet/sdk-v2";
-import { Pool } from "./getPool";
+import { Pool } from "./subgraph/getPool";
 
 type GetBorrowOptionsParams = {
   pool: Pool; // MetaStreet pool

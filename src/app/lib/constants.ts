@@ -1,0 +1,1 @@
+export const SEPOLIA_WATCHES_POOL_ADDRESS = "0x929d2634dde48e7ae5aae8ba444fdaa8eefdea37";

@@ -4,11 +4,11 @@ import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/c
 import { useState } from "react";
 import { Hash, encodePacked, erc721Abi, size } from "viem";
 import { useAccount } from "wagmi";
-import { POOL_ABI } from "../lib/abi";
-import { BorrowOption } from "../lib/getBorrowOptions";
-import { Pool } from "../lib/getPool";
-import { FixedPoint } from "../lib/utils";
-import { wagmiConfig } from "./Providers";
+import { POOL_ABI } from "../../lib/abis/Pool";
+import { BorrowOption } from "../../lib/getBorrowOptions";
+import { Pool } from "../../lib/subgraph/getPool";
+import { FixedPoint } from "../../lib/utils";
+import { wagmiConfig } from "../Providers";
 
 type BorrowButtonProps = {
   pool: Pool;
@@ -88,7 +88,7 @@ export function BorrowButton(props: BorrowButtonProps) {
   if (!connectedWalletAddress) return <span>Connect wallet</span>;
 
   return (
-    <button className="border bg-black text-white p-4" onClick={borrow} disabled={isLoading}>
+    <button className="button" onClick={borrow} disabled={isLoading} type="button">
       {isLoading ? "Loading..." : "Borrow"}
     </button>
   );
