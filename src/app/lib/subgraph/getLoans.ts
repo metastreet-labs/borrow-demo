@@ -17,6 +17,9 @@ const LOANS_QUERY = gql`
       maturity
       duration
       timestamp
+      ticks
+      useds
+      interests
     }
   }
 `;
@@ -31,6 +34,9 @@ const LOANS_SCHEMA = z.array(
     maturity: zodStringToNumber,
     duration: zodStringToNumber,
     timestamp: zodStringToNumber,
+    ticks: z.array(zodStringToBigInt),
+    useds: z.array(zodStringToBigInt),
+    interests: z.array(zodStringToBigInt),
   }),
 );
 

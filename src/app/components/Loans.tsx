@@ -8,6 +8,7 @@ import { Loan, getLoans } from "../lib/subgraph/getLoans";
 import { Pool, getPool } from "../lib/subgraph/getPool";
 import { FixedPoint, fromUnits, printNumber, toUnits } from "../lib/utils";
 import { RepayButton } from "./RepayButton";
+import { Refinance } from "./refinance/Refinance";
 
 export function Loans() {
   const { address: connectedWalletAddress } = useAccount();
@@ -55,11 +56,14 @@ export function Loans() {
       <h2>Loans List</h2>
       <div className="flex flex-wrap gap-2">{rows}</div>
 
-      <h2 className="mt-8">Manage Loan</h2>
+      <h2 className="my-8">Manage Loan</h2>
 
       {selectedItem ? (
-        <div className="flex flex-col items-start">
-          <RepayButton {...selectedItem} />
+        <div className="flex flex-col items-start gap-8">
+          <>
+            <RepayButton {...selectedItem} />
+            <Refinance {...selectedItem} />
+          </>
         </div>
       ) : (
         <span>Select a loan</span>

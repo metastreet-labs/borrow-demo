@@ -2,16 +2,16 @@
 
 import { SEPOLIA_WATCHES_POOL_ADDRESS } from "@/app/lib/constants";
 import { useBorrowData } from "@/app/lib/useBorrowData";
-import { fromUnits, getDaysFromSeconds, printNumber } from "@/app/lib/utils";
 import { ReactNode, useState } from "react";
 import { isAddress } from "viem";
 import { BorrowButton } from "./BorrowButton";
+import { BorrowTerms } from "./BorrowTerms";
 
 export function Borrow() {
   const [poolAddress, setPoolAddress] = useState(SEPOLIA_WATCHES_POOL_ADDRESS);
   const [tokenId, setTokenId] = useState("");
 
-  const { data, error } = useBorrowData({ poolAddress, tokenId });
+  const { data, error } = useBorrowData({ pool: poolAddress, tokenId });
 
   const [selectedBorrowOptionIndex, setSelectedBorrowOptionIndex] = useState(0);
 
@@ -35,26 +35,14 @@ export function Borrow() {
     } = data;
 
     borrowOptionsNode = borrowOptions.map((option, idx) => {
-      const id = `borrow-option-${idx}`;
-      const principal = `${printNumber(fromUnits(option.principal))} ${symbol}`;
-      const duration = `${getDaysFromSeconds(option.duration)}d`;
-      const repayment = `${printNumber(fromUnits(option.repayment))} ${symbol}`;
-
       return (
-        <div key={idx} className="flex items-start gap-2 p-2 border">
-          <input
-            id={id}
-            type="radio"
-            checked={idx == selectedBorrowOptionIndex}
-            onChange={() => setSelectedBorrowOptionIndex(idx)}
-            className="mt-2"
-          />
-          <label htmlFor={id} className="flex flex-col text-sm">
-            <span>Principal: {principal}</span>
-            <span>Duration: {duration}</span>
-            <span>Repayment: {repayment}</span>
-          </label>
-        </div>
+        <BorrowTerms
+          key={idx}
+          option={option}
+          currencySymbol={symbol}
+          selected={idx == selectedBorrowOptionIndex}
+          onSelected={() => setSelectedBorrowOptionIndex(idx)}
+        />
       );
     });
 
