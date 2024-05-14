@@ -7,6 +7,7 @@ import { POOL_ABI } from "../../lib/abis/Pool";
 import { BorrowOption } from "../../lib/getBorrowOptions";
 import { Pool } from "../../lib/subgraph/getPool";
 import { FixedPoint } from "../../lib/utils";
+import { getMaxRepayment } from "../Loans";
 import { useWeb3, wagmiConfig } from "../Providers";
 
 type BorrowButtonProps = {
@@ -49,7 +50,7 @@ export function BorrowButton(props: BorrowButtonProps) {
     const { principal, repayment, duration, nodes } = borrowOption;
 
     /* protect user by reverting the transaction if repayment exceeds this value */
-    const maxRepayment = principal + (10_500n * (repayment - principal)) / 10_000n;
+    const maxRepayment = getMaxRepayment(principal, repayment);
 
     /* Send borrow transaction */
     const hash = await writeContract(wagmiConfig, {
@@ -63,7 +64,7 @@ export function BorrowButton(props: BorrowButtonProps) {
         pool.collateralToken.id,
         BigInt(tokenId),
         /* down scaling required here too, must round "up" */
-        FixedPoint.scaleDown(maxRepayment, FixedPoint.DECIMALS - decimals, "up"),
+        FixedPoint.scaleDown(maxRepayment, FixedPoint.DECIMALS - decimals),
         nodes,
         encodePacked(["uint16", "uint16", "bytes"], [5, size(oracleContext), oracleContext]),
       ],

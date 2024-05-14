@@ -7,7 +7,7 @@ import { BorrowOption } from "../../lib/getBorrowOptions";
 import { Loan } from "../../lib/subgraph/getLoans";
 import { Pool } from "../../lib/subgraph/getPool";
 import { FixedPoint, fromUnits, printNumber } from "../../lib/utils";
-import { getLoanProratedRepayment } from "../Loans";
+import { getLoanProratedRepayment, getMaxRepayment } from "../Loans";
 import { useWeb3, wagmiConfig } from "../Providers";
 
 type RefinanceButtonProps = {
@@ -27,6 +27,9 @@ export function RefinanceButton(props: RefinanceButtonProps) {
     FixedPoint.DECIMALS - pool.currencyToken.decimals,
     "up",
   );
+
+  /* protect user by reverting the transaction if repayment exceeds this value */
+  const maxRepayment = getMaxRepayment(borrowOption.principal, borrowOption.repayment);
 
   const { data: balance } = useReadContract(
     connectedWalletAddress
@@ -75,11 +78,7 @@ export function RefinanceButton(props: RefinanceButtonProps) {
           FixedPoint.DECIMALS - pool.currencyToken.decimals,
         ),
         BigInt(borrowOption.duration),
-        FixedPoint.scaleDown(
-          borrowOption.repayment,
-          FixedPoint.DECIMALS - pool.currencyToken.decimals,
-          "up",
-        ),
+        FixedPoint.scaleDown(maxRepayment, FixedPoint.DECIMALS - pool.currencyToken.decimals),
         borrowOption.nodes,
         encodePacked(["uint16", "uint16", "bytes"], [5, size(oracleContext), oracleContext]),
       ],

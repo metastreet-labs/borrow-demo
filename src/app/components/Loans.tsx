@@ -108,11 +108,12 @@ export function getLoanProration(loan: Loan) {
   const currentTimestamp = new Date().getTime() / 1000 + 60;
   return Math.min((currentTimestamp - loan.timestamp) / loan.duration, 1.0);
 }
+
 export function getLoanProratedRepayment(loan: Loan) {
   const proration = getLoanProration(loan);
   return FixedPoint.mul(loan.repayment - loan.principal, toUnits(proration)) + loan.principal;
 }
 
-export function getRefinanceDownpayment(loan: Loan, newPrincipal: bigint) {
-  return getLoanProratedRepayment(loan) - newPrincipal;
+export function getMaxRepayment(principal: bigint, repayment: bigint) {
+  return principal + (10_500n * (repayment - principal)) / 10_000n;
 }
