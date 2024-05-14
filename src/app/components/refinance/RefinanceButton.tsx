@@ -1,14 +1,14 @@
 import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { Hex, encodePacked, erc20Abi, size } from "viem";
-import { useAccount, useReadContract } from "wagmi";
+import { useReadContract } from "wagmi";
 import { POOL_ABI } from "../../lib/abis/Pool";
 import { BorrowOption } from "../../lib/getBorrowOptions";
 import { Loan } from "../../lib/subgraph/getLoans";
 import { Pool } from "../../lib/subgraph/getPool";
 import { FixedPoint, fromUnits, printNumber } from "../../lib/utils";
 import { getLoanProratedRepayment } from "../Loans";
-import { wagmiConfig } from "../Providers";
+import { useWeb3, wagmiConfig } from "../Providers";
 
 type RefinanceButtonProps = {
   pool: Pool;
@@ -20,7 +20,7 @@ type RefinanceButtonProps = {
 export function RefinanceButton(props: RefinanceButtonProps) {
   const { pool, loan, borrowOption, oracleContext } = props;
 
-  const { address: connectedWalletAddress } = useAccount();
+  const { connectedWalletAddress } = useWeb3();
 
   const downpayment = FixedPoint.scaleDown(
     getLoanProratedRepayment(loan) - borrowOption.principal,

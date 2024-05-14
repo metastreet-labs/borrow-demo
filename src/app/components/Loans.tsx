@@ -2,16 +2,16 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
-import { useAccount } from "wagmi";
 import { SEPOLIA_WATCHES_POOL_ADDRESS } from "../lib/constants";
 import { Loan, getLoans } from "../lib/subgraph/getLoans";
 import { Pool, getPool } from "../lib/subgraph/getPool";
 import { FixedPoint, fromUnits, printNumber, toUnits } from "../lib/utils";
+import { useWeb3 } from "./Providers";
 import { RepayButton } from "./RepayButton";
 import { Refinance } from "./refinance/Refinance";
 
 export function Loans() {
-  const { address: connectedWalletAddress } = useAccount();
+  const { connectedWalletAddress } = useWeb3();
 
   const { data, error } = useQuery({
     queryKey: ["loans", connectedWalletAddress] as const,

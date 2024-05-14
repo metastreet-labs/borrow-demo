@@ -3,12 +3,11 @@
 import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { Hash, encodePacked, erc721Abi, size } from "viem";
-import { useAccount } from "wagmi";
 import { POOL_ABI } from "../../lib/abis/Pool";
 import { BorrowOption } from "../../lib/getBorrowOptions";
 import { Pool } from "../../lib/subgraph/getPool";
 import { FixedPoint } from "../../lib/utils";
-import { wagmiConfig } from "../Providers";
+import { useWeb3, wagmiConfig } from "../Providers";
 
 type BorrowButtonProps = {
   pool: Pool;
@@ -20,7 +19,7 @@ type BorrowButtonProps = {
 export function BorrowButton(props: BorrowButtonProps) {
   const { pool, borrowOption, oracleContext, tokenId } = props;
 
-  const { address: connectedWalletAddress } = useAccount();
+  const { connectedWalletAddress } = useWeb3();
 
   const [isLoading, setIsLoading] = useState(false);
 
