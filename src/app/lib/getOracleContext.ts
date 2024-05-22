@@ -1,6 +1,6 @@
-import { Hash, encodeAbiParameters, parseAbiParameters } from "viem";
+import { encodeAbiParameters, parseAbiParameters } from "viem";
 import { z } from "zod";
-import { zodAddress } from "./utils";
+import { zodAddress, zodHex } from "./utils";
 
 const schema = z.object({
   token: zodAddress,
@@ -14,7 +14,7 @@ const schema = z.object({
     r: z.number(),
     s: z.number(),
     v: z.number(),
-    signature: z.string().transform((s) => `0x${s}` as Hash),
+    signature: zodHex,
   }),
 });
 
