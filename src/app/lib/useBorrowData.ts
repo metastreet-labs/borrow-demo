@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import * as devalue from "devalue";
 import { Address, isAddress } from "viem";
+import { useBlockNumber } from "wagmi";
 import { useWeb3, wagmiConfig } from "../components/Providers";
 import { getBorrowOptions } from "../lib/getBorrowOptions";
 import { getOracleContext } from "../lib/getOracleContext";
@@ -21,8 +22,10 @@ type UseBorrowOptionsParams = {
 export function useBorrowData(params: UseBorrowOptionsParams) {
   const { chainId } = useWeb3();
 
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+
   return useQuery({
-    queryKey: ["borrow-options", chainId, devalue.stringify(params)] as const,
+    queryKey: ["borrow-options", chainId, devalue.stringify({ ...params, blockNumber })] as const,
     queryFn: async ({ queryKey }) => {
       const [, chainId, stringifiedParams] = queryKey;
 
@@ -66,5 +69,6 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
     },
     enabled: typeof params.pool != "string" || isAddress(params.pool),
     retry: false,
+    placeholderData: (prev) => prev,
   });
 }
