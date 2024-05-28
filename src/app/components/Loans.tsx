@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
-import { SEPOLIA_WATCHES_POOL_ADDRESS } from "../lib/constants";
+import { WATCHES_POOL_ADDRESS } from "../lib/constants";
 import { Loan, getLoans } from "../lib/subgraph/getLoans";
 import { Pool, getPool } from "../lib/subgraph/getPool";
 import { FixedPoint, fromUnits, printNumber, toUnits } from "../lib/utils";
@@ -11,16 +11,17 @@ import { RepayButton } from "./RepayButton";
 import { Refinance } from "./refinance/Refinance";
 
 export function Loans() {
-  const { connectedWalletAddress } = useWeb3();
+  const { chainId, connectedWalletAddress } = useWeb3();
 
   const { data, error } = useQuery({
-    queryKey: ["loans", connectedWalletAddress] as const,
+    queryKey: ["loans", chainId, connectedWalletAddress] as const,
     queryFn: ({ queryKey }) => {
-      const [, borrower] = queryKey;
+      const [, chainId, borrower] = queryKey;
       if (!borrower) throw new Error("borrower undefined");
+      const poolAddress = WATCHES_POOL_ADDRESS[chainId];
       return Promise.all([
-        getPool(SEPOLIA_WATCHES_POOL_ADDRESS),
-        getLoans({ borrower, pool: SEPOLIA_WATCHES_POOL_ADDRESS }),
+        getPool({ chainId, poolAddress }),
+        getLoans({ chainId, borrower, pool: poolAddress }),
       ]);
     },
     staleTime: Infinity,

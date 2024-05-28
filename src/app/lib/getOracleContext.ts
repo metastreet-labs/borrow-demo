@@ -1,4 +1,5 @@
 import { encodeAbiParameters, parseAbiParameters } from "viem";
+import { base, sepolia } from "viem/chains";
 import { z } from "zod";
 import { zodAddress, zodHex } from "./utils";
 
@@ -18,9 +19,14 @@ const schema = z.object({
   }),
 });
 
-export async function getOracleContext(tokenId: string) {
+const WATCHES_API_URL: Record<number, string> = {
+  [base.id]: "https://api.watches.io",
+  [sepolia.id]: "https://api-dev.horodex.io",
+};
+
+export async function getOracleContext(chainId: number, tokenId: string) {
   const response = await fetch(
-    `https://api-dev.horodex.io/public/marketplace/physical-watch/token/quote?token_id=${tokenId}`,
+    `${WATCHES_API_URL[chainId]}/public/marketplace/physical-watch/token/quote?token_id=${tokenId}`,
   );
 
   const data = schema.parse(await response.json());

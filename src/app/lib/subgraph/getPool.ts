@@ -1,13 +1,10 @@
 "use server";
 
-import { GraphQLClient, gql } from "graphql-request";
+import { gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
 import { zodAddress, zodStringToBigInt } from "../utils";
-
-const SUBGRAPH_URL = `${process.env["SUBGRAPH_URL"]}`;
-
-const GRAPHQL_CLIENT = new GraphQLClient(SUBGRAPH_URL);
+import { getGQLClient } from "./graphqlClient";
 
 const POOL_QUERY = gql`
   query PoolQuery($id: String!) {
@@ -59,7 +56,13 @@ const POOL_SCHEMA = z.object({
 
 export type Pool = z.infer<typeof POOL_SCHEMA>;
 
-export async function getPool(poolAddress: Address) {
-  const response = await GRAPHQL_CLIENT.request<any>(POOL_QUERY, { id: poolAddress });
+type GetPoolParams = {
+  chainId: number;
+  poolAddress: Address;
+};
+
+export async function getPool(params: GetPoolParams) {
+  const { chainId, poolAddress } = params;
+  const response = await getGQLClient(chainId).request<any>(POOL_QUERY, { id: poolAddress });
   return POOL_SCHEMA.parse(response.pool);
 }

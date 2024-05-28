@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import * as devalue from "devalue";
 import { Address, isAddress } from "viem";
-import { wagmiConfig } from "../components/Providers";
+import { useWeb3, wagmiConfig } from "../components/Providers";
 import { getBorrowOptions } from "../lib/getBorrowOptions";
 import { getOracleContext } from "../lib/getOracleContext";
 import { SSPO_ABI } from "./abis/SimpleSignedPriceOracle";
@@ -19,10 +19,12 @@ type UseBorrowOptionsParams = {
 };
 
 export function useBorrowData(params: UseBorrowOptionsParams) {
+  const { chainId } = useWeb3();
+
   return useQuery({
-    queryKey: ["borrow-options", devalue.stringify(params)] as const,
+    queryKey: ["borrow-options", chainId, devalue.stringify(params)] as const,
     queryFn: async ({ queryKey }) => {
-      const [, stringifiedParams] = queryKey;
+      const [, chainId, stringifiedParams] = queryKey;
 
       const {
         pool: poolAddressOrObject,
@@ -32,10 +34,10 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
 
       const pool =
         typeof poolAddressOrObject == "string"
-          ? await getPool(poolAddressOrObject as Address)
+          ? await getPool({ chainId, poolAddress: poolAddressOrObject as Address })
           : poolAddressOrObject;
 
-      const oracleContext = await getOracleContext(tokenId);
+      const oracleContext = await getOracleContext(chainId, tokenId);
 
       const price = await readContract(wagmiConfig, {
         address: pool.id,

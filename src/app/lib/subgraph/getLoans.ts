@@ -4,7 +4,7 @@ import { gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
 import { zodHex, zodStringToBigInt, zodStringToNumber } from "../utils";
-import { GRAPHQL_CLIENT } from "./graphqlClient";
+import { getGQLClient } from "./graphqlClient";
 
 const LOANS_QUERY = gql`
   query Loans($pool: String!, $borrower: String!) {
@@ -43,11 +43,13 @@ const LOANS_SCHEMA = z.array(
 export type Loan = z.infer<typeof LOANS_SCHEMA>[number];
 
 type GetLoansParams = {
+  chainId: number;
   pool: Address;
   borrower: Address;
 };
 
 export async function getLoans(params: GetLoansParams) {
-  const response = await GRAPHQL_CLIENT.request<any>(LOANS_QUERY, params);
+  const { chainId, ...variables } = params;
+  const response = await getGQLClient(chainId).request<any>(LOANS_QUERY, variables);
   return LOANS_SCHEMA.parse(response.loans);
 }

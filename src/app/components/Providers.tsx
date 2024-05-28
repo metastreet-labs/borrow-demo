@@ -4,17 +4,19 @@ import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, createContext, useContext } from "react";
 import { Address } from "viem";
-import { sepolia } from "viem/chains";
-import { WagmiProvider, http, useAccount } from "wagmi";
+import { base, sepolia } from "viem/chains";
+import { WagmiProvider, http, useAccount, useChainId } from "wagmi";
 
-const RPC_URL = `${process.env[`NEXT_PUBLIC_RPC_URL`]}`;
+const SEPOLIA_RPC_URL = `${process.env[`NEXT_PUBLIC_RPC_URL_SEPOLIA`]}`;
+const BASE_RPC_URL = `${process.env[`NEXT_PUBLIC_RPC_URL_BASE`]}`;
 
 export const wagmiConfig = getDefaultConfig({
   appName: "MetaStreet Borrow Demo",
   projectId: "YOUR_PROJECT_ID",
-  chains: [sepolia],
+  chains: [base, sepolia],
   transports: {
-    [sepolia.id]: http(RPC_URL),
+    [base.id]: http(BASE_RPC_URL),
+    [sepolia.id]: http(SEPOLIA_RPC_URL),
   },
   ssr: true,
 });
@@ -33,7 +35,7 @@ export function Providers(props: PropsWithChildren) {
   );
 }
 
-type Web3ContextType = { connectedWalletAddress: Address | undefined };
+type Web3ContextType = { chainId: number; connectedWalletAddress: Address | undefined };
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
 
@@ -45,9 +47,11 @@ export function useWeb3() {
 
 export function Web3Provider(props: PropsWithChildren) {
   const { address: connectedWalletAddress } = useAccount();
+  const chainId = useChainId();
 
   const context: Web3ContextType = {
-    connectedWalletAddress, // can set a custom address to impersonate,
+    chainId,
+    connectedWalletAddress: "0xeCC12Bd7D6482D058398cA86266d90BDC8CEB2AA", // can set a custom address to impersonate,
   };
 
   return <Web3Context.Provider value={context} {...props} />;
