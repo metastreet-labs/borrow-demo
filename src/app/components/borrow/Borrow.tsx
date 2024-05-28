@@ -1,15 +1,21 @@
 "use client";
 
-import { SEPOLIA_WATCHES_POOL_ADDRESS } from "@/app/lib/constants";
+import { WATCHES_POOL_ADDRESS } from "@/app/lib/constants";
 import { useBorrowData } from "@/app/lib/useBorrowData";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { isAddress } from "viem";
+import { useWeb3 } from "../Providers";
 import { BorrowButton } from "./BorrowButton";
 import { BorrowTerms } from "./BorrowTerms";
 
 export function Borrow() {
-  const [poolAddress, setPoolAddress] = useState(SEPOLIA_WATCHES_POOL_ADDRESS);
+  const [poolAddress, setPoolAddress] = useState("");
   const [tokenId, setTokenId] = useState("");
+
+  const { chainId } = useWeb3();
+  useEffect(() => {
+    setPoolAddress(WATCHES_POOL_ADDRESS[chainId]);
+  }, [chainId]);
 
   const { data, error } = useBorrowData({ pool: poolAddress, tokenId });
 

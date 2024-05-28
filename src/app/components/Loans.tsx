@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { WATCHES_POOL_ADDRESS } from "../lib/constants";
 import { Loan, getLoans } from "../lib/subgraph/getLoans";
 import { Pool, getPool } from "../lib/subgraph/getPool";
@@ -30,6 +30,10 @@ export function Loans() {
 
   type LoanItem = { pool: Pool; loan: Loan };
   const [selectedItem, setSelectedItem] = useState<LoanItem>();
+
+  useEffect(() => {
+    setSelectedItem(undefined);
+  }, [chainId]);
 
   let rows: ReactNode;
   if (!connectedWalletAddress) {
