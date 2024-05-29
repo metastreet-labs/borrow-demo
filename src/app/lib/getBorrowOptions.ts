@@ -71,7 +71,12 @@ function getLiquidityNodes(pool: Pool, loan?: Loan) {
       used: loan.useds[idx],
       pending: loan.useds[idx] + loan.interests[idx],
     }));
-    nodes = router.apply(nodes, receipts, getLoanProration(loan));
+    /*
+     * refinancing uses liquidity from the loan repayment to make a new loan.
+     * the higher the proration the higher the repayment amount,
+     * so we use a -60s delta to avoid getting "InsufficientLiquidity" errors.
+     */
+    nodes = router.apply(nodes, receipts, getLoanProration(loan, -60));
   }
 
   return nodes;

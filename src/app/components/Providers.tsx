@@ -51,7 +51,7 @@ export function Web3Provider(props: PropsWithChildren) {
 
   const context: Web3ContextType = {
     chainId,
-    connectedWalletAddress: "0xeCC12Bd7D6482D058398cA86266d90BDC8CEB2AA", // can set a custom address to impersonate,
+    connectedWalletAddress, // can set a custom address to impersonate,
   };
 
   return <Web3Context.Provider value={context} {...props} />;

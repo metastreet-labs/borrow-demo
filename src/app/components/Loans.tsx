@@ -105,17 +105,18 @@ function LoanItem(props: LoanItemProps) {
 
 /* Loan stuff */
 
-export function getLoanProration(loan: Loan) {
-  /*
-   * might wanna add more than 60 seconds if you start seeing
-   * "insufficient allowance" errors (or use infinite approval)
-   */
-  const currentTimestamp = new Date().getTime() / 1000 + 60;
+export function getLoanProration(loan: Loan, delta: number) {
+  const currentTimestamp = new Date().getTime() / 1000 + delta;
   return Math.min((currentTimestamp - loan.timestamp) / loan.duration, 1.0);
 }
 
 export function getLoanProratedRepayment(loan: Loan) {
-  const proration = getLoanProration(loan);
+  /*
+   * loan repayment is mainly used as an input to the erc20 `approve` function.
+   * so use a 60s delta to avoid getting "insufficient allowance"
+   * (calculate a repayment 60s in the future)
+   */
+  const proration = getLoanProration(loan, 60);
   return FixedPoint.mul(loan.repayment - loan.principal, toUnits(proration)) + loan.principal;
 }
 
