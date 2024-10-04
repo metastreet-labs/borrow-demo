@@ -71,7 +71,7 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
           price,
           FixedPoint.DECIMALS - pool.currencyToken.decimals,
         ),
-      });
+      }).filter((o) => o.principal != o.repayment);
 
       return { borrowOptions, pool, oracleContext };
     },
