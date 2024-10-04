@@ -1,7 +1,7 @@
 "use server";
 
 import { gql } from "graphql-request";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
 import { z } from "zod";
 import { zodAddress, zodStringToBigInt } from "../utils";
 import { getGQLClient } from "./graphqlClient";
@@ -27,6 +27,7 @@ const POOL_QUERY = gql`
         shares
         redemptionPending
       }
+      externalPriceOracle
     }
   }
 `;
@@ -52,6 +53,7 @@ const POOL_SCHEMA = z.object({
       redemptionPending: zodStringToBigInt,
     }),
   ),
+  externalPriceOracle: zodAddress.nullable().transform((a) => a ?? zeroAddress),
 });
 
 export type Pool = z.infer<typeof POOL_SCHEMA>;

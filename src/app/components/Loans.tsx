@@ -2,9 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ReactNode, useEffect, useState } from "react";
-import { WATCHES_POOL_ADDRESS } from "../lib/constants";
+import { isAddress } from "viem";
 import { Loan, getLoans } from "../lib/subgraph/getLoans";
-import { Pool, getPool } from "../lib/subgraph/getPool";
+import { getPool } from "../lib/subgraph/getPool";
+import { useSearchParamsMutation } from "../lib/useSearchParamsMutation";
 import { FixedPoint, fromUnits, printNumber, toUnits } from "../lib/utils";
 import { useWeb3 } from "./Providers";
 import { RepayButton } from "./RepayButton";
@@ -12,27 +13,30 @@ import { Refinance } from "./refinance/Refinance";
 
 export function Loans() {
   const { chainId, connectedWalletAddress } = useWeb3();
+  const sp = useSearchParamsMutation();
+
+  const poolAddress = sp.get("pool") ?? "";
 
   const { data, error } = useQuery({
-    queryKey: ["loans", chainId, connectedWalletAddress] as const,
+    queryKey: ["loans", chainId, poolAddress, connectedWalletAddress] as const,
     queryFn: ({ queryKey }) => {
-      const [, chainId, borrower] = queryKey;
+      const [, chainId, poolAddress, borrower] = queryKey;
       if (!borrower) throw new Error("borrower undefined");
-      const poolAddress = WATCHES_POOL_ADDRESS[chainId];
+      if (!isAddress(poolAddress)) throw new Error("poolAddress is not an address");
+
       return Promise.all([
         getPool({ chainId, poolAddress }),
         getLoans({ chainId, borrower, pool: poolAddress }),
       ]);
     },
     staleTime: Infinity,
-    enabled: Boolean(connectedWalletAddress),
+    enabled: Boolean(connectedWalletAddress && isAddress(poolAddress)),
   });
 
-  type LoanItem = { pool: Pool; loan: Loan };
-  const [selectedItem, setSelectedItem] = useState<LoanItem>();
+  const [selectedLoan, setSelectedLoan] = useState<Loan>();
 
   useEffect(() => {
-    setSelectedItem(undefined);
+    setSelectedLoan(undefined);
   }, [chainId]);
 
   let rows: ReactNode;
@@ -44,12 +48,11 @@ export function Loans() {
   } else {
     if (!data[1].length) rows = <span>No Active loans for this wallet</span>;
     else {
-      const pool = data[0];
       rows = data[1].map((loan) => (
         <LoanItem
           loan={loan}
-          onClick={() => setSelectedItem({ loan, pool })}
-          selected={selectedItem?.loan.id == loan.id}
+          onClick={() => setSelectedLoan(loan)}
+          selected={selectedLoan?.id == loan.id}
           key={loan.id}
         />
       ));
@@ -63,11 +66,11 @@ export function Loans() {
 
       <h2 className="my-8">Manage Loan</h2>
 
-      {selectedItem ? (
+      {data && selectedLoan ? (
         <div className="flex flex-col items-start gap-8">
           <>
-            <RepayButton {...selectedItem} />
-            <Refinance {...selectedItem} />
+            <RepayButton pool={data[0]} loan={selectedLoan} />
+            <Refinance pool={data[0]} loan={selectedLoan} />
           </>
         </div>
       ) : (
@@ -116,7 +119,7 @@ export function getLoanProratedRepayment(loan: Loan) {
    * so use a 60s delta to avoid getting "insufficient allowance"
    * (calculate a repayment 60s in the future)
    */
-  const proration = getLoanProration(loan, 60);
+  const proration = getLoanProration(loan, 120);
   return FixedPoint.mul(loan.repayment - loan.principal, toUnits(proration)) + loan.principal;
 }
 

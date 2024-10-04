@@ -1,23 +1,20 @@
 "use client";
 
-import { WATCHES_POOL_ADDRESS } from "@/app/lib/constants";
 import { useBorrowData } from "@/app/lib/useBorrowData";
-import { ReactNode, useEffect, useState } from "react";
+import { useSearchParamsMutation } from "@/app/lib/useSearchParamsMutation";
+import { ReactNode, useState } from "react";
 import { isAddress } from "viem";
-import { useWeb3 } from "../Providers";
 import { BorrowButton } from "./BorrowButton";
 import { BorrowTerms } from "./BorrowTerms";
 
 export function Borrow() {
-  const [poolAddress, setPoolAddress] = useState("");
-  const [tokenId, setTokenId] = useState("");
+  const sp = useSearchParamsMutation();
 
-  const { chainId } = useWeb3();
-  useEffect(() => {
-    setPoolAddress(WATCHES_POOL_ADDRESS[chainId]);
-  }, [chainId]);
+  const poolAddress = sp.get("pool") ?? "";
+  const tokenId = sp.get("tokenId") ?? "";
 
   const { data, error } = useBorrowData({ pool: poolAddress, tokenId });
+  console.log({ data, error });
 
   const [selectedBorrowOptionIndex, setSelectedBorrowOptionIndex] = useState(0);
 
@@ -30,7 +27,7 @@ export function Borrow() {
   if (!isPoolAddressValid) borrowOptionsNode = <span>Enter a valid pool address</span>;
   else if (!isTokenIdValid) borrowOptionsNode = <span>Enter a valid token id</span>;
   else if (!data) {
-    if (error) borrowOptionsNode = <span>{error.message}</span>;
+    if (error) borrowOptionsNode = <span className="text-red-500">{error.message}</span>;
     else borrowOptionsNode = <span>Loading...</span>;
   } else {
     const {
@@ -71,14 +68,14 @@ export function Borrow() {
 
       <input
         value={poolAddress}
-        onChange={(e) => setPoolAddress(e.target.value)}
+        onChange={(e) => sp.set("pool", e.target.value)}
         placeholder="Pool address"
       />
 
       <input
         type="number"
         value={tokenId}
-        onChange={(e) => setTokenId(e.target.value)}
+        onChange={(e) => sp.set("tokenId", e.target.value)}
         placeholder="Token id"
       />
 

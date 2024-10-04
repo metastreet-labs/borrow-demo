@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import * as devalue from "devalue";
-import { Address, isAddress } from "viem";
+import { Address, isAddress, zeroAddress } from "viem";
 import { useBlockNumber } from "wagmi";
 import { useWeb3, wagmiConfig } from "../components/Providers";
 import { getBorrowOptions } from "../lib/getBorrowOptions";
-import { getOracleContext } from "../lib/getOracleContext";
 import { SSPO_ABI } from "./abis/SimpleSignedPriceOracle";
+import { getOracleContext } from "./oracle-context";
 import { Loan } from "./subgraph/getLoans";
 import { Pool, getPool } from "./subgraph/getPool";
 import { FixedPoint } from "./utils";
@@ -40,20 +40,28 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
           ? await getPool({ chainId, poolAddress: poolAddressOrObject as Address })
           : poolAddressOrObject;
 
-      const oracleContext = await getOracleContext(chainId, tokenId);
-
-      const price = await readContract(wagmiConfig, {
-        address: pool.id,
-        abi: SSPO_ABI,
-        functionName: "price",
-        args: [
-          pool.collateralToken.id,
-          pool.currencyToken.id,
-          [BigInt(tokenId)],
-          [1n], // token id quantities, always 1 for erc721
-          oracleContext,
-        ],
+      const oracleContext = await getOracleContext({
+        chainId,
+        pool: pool.id,
+        collateralToken: pool.collateralToken.id,
+        collateralTokenId: tokenId,
       });
+
+      const price =
+        pool.externalPriceOracle == zeroAddress
+          ? 0n
+          : await readContract(wagmiConfig, {
+              address: pool.id,
+              abi: SSPO_ABI,
+              functionName: "price",
+              args: [
+                pool.collateralToken.id,
+                pool.currencyToken.id,
+                [BigInt(tokenId)],
+                [1n],
+                oracleContext,
+              ],
+            });
 
       const borrowOptions = getBorrowOptions({
         pool,

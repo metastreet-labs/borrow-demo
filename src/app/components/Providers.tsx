@@ -4,19 +4,19 @@ import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, createContext, useContext } from "react";
 import { Address } from "viem";
-import { base, sepolia } from "viem/chains";
+import { mainnet, sepolia } from "viem/chains";
 import { WagmiProvider, http, useAccount, useChainId } from "wagmi";
 
-const SEPOLIA_RPC_URL = `${process.env[`NEXT_PUBLIC_RPC_URL_SEPOLIA`]}`;
-const BASE_RPC_URL = `${process.env[`NEXT_PUBLIC_RPC_URL_BASE`]}`;
+const RPC_URL_MAINNET = `${process.env["NEXT_PUBLIC_RPC_URL_MAINNET"]}`;
+const RPC_URL_SEPOLIA = `${process.env["NEXT_PUBLIC_RPC_URL_SEPOLIA"]}`;
 
 export const wagmiConfig = getDefaultConfig({
   appName: "MetaStreet Borrow Demo",
   projectId: "YOUR_PROJECT_ID",
-  chains: [base, sepolia],
+  chains: [mainnet, sepolia],
   transports: {
-    [base.id]: http(BASE_RPC_URL),
-    [sepolia.id]: http(SEPOLIA_RPC_URL),
+    [mainnet.id]: http(RPC_URL_MAINNET),
+    [sepolia.id]: http(RPC_URL_SEPOLIA),
   },
   ssr: true,
 });
