@@ -1,5 +1,6 @@
 import type { Address, Hash } from "viem";
 import { SSPO_POOLS } from "./constants";
+import { getDiamoreOracleContext } from "./getDiamoreOracleContext";
 import { getFabricaOracleContext } from "./getFabricaOracleContext";
 import { getWatchesOracleContext } from "./getWatchesOracleContext";
 
@@ -20,6 +21,8 @@ export async function getOracleContext(params: GetOracleContextParams): Promise<
   if (sspo_pools.watches == _pool) return getWatchesOracleContext(params);
 
   if (sspo_pools.fabrica.includes(_pool)) return getFabricaOracleContext(params);
+
+  if (sspo_pools.diamore == _pool) return getDiamoreOracleContext(params);
 
   return "0x";
 }
