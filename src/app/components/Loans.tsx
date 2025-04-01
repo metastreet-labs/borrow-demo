@@ -116,8 +116,8 @@ export function getLoanProration(loan: Loan, delta: number) {
 export function getLoanProratedRepayment(loan: Loan) {
   /*
    * loan repayment is mainly used as an input to the erc20 `approve` function.
-   * so use a 60s delta to avoid getting "insufficient allowance"
-   * (calculate a repayment 60s in the future)
+   * so use a 120s delta to avoid getting "insufficient allowance"
+   * (calculate a repayment 120s in the future)
    */
   const proration = getLoanProration(loan, 120);
   return FixedPoint.mul(loan.repayment - loan.principal, toUnits(proration)) + loan.principal;
