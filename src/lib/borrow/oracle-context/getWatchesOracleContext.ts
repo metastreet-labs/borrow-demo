@@ -1,6 +1,6 @@
 import { base, sepolia } from "viem/chains";
 import { z } from "zod";
-import { zodAddress, zodHex } from "../utils";
+import { zodAddress, zodHex } from "../../shared/utils";
 import type { Quote } from "./encodeOracleContext";
 import { encodeOracleContext } from "./encodeOracleContext";
 import type { GetOracleContextParams } from "./getOracleContext";

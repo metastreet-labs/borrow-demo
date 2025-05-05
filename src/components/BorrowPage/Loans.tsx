@@ -1,15 +1,16 @@
 "use client";
 
+import { getLoanProratedRepayment } from "@/lib/borrow/calcs";
 import { useQuery } from "@tanstack/react-query";
 import { ReactNode, useEffect, useState } from "react";
 import { isAddress } from "viem";
-import { Loan, getLoans } from "../lib/subgraph/getLoans";
-import { getPool } from "../lib/subgraph/getPool";
-import { useSearchParamsMutation } from "../lib/useSearchParamsMutation";
-import { FixedPoint, fromUnits, printNumber, toUnits } from "../lib/utils";
-import { useWeb3 } from "./Providers";
-import { RepayButton } from "./RepayButton";
+import { useSearchParamsMutation } from "../../lib/shared/useSearchParamsMutation";
+import { fromUnits, printNumber } from "../../lib/shared/utils";
+import { Loan, getLoans } from "../../lib/subgraph/getLoans";
+import { getPool } from "../../lib/subgraph/getPool";
+import { useWeb3 } from "../shared/Providers";
 import { Refinance } from "./refinance/Refinance";
+import { RepayButton } from "./RepayButton";
 
 export function Loans() {
   const { chainId, connectedWalletAddress } = useWeb3();
@@ -107,22 +108,3 @@ function LoanItem(props: LoanItemProps) {
 }
 
 /* Loan stuff */
-
-export function getLoanProration(loan: Loan, delta: number) {
-  const currentTimestamp = new Date().getTime() / 1000 + delta;
-  return Math.min((currentTimestamp - loan.timestamp) / loan.duration, 1.0);
-}
-
-export function getLoanProratedRepayment(loan: Loan) {
-  /*
-   * loan repayment is mainly used as an input to the erc20 `approve` function.
-   * so use a 120s delta to avoid getting "insufficient allowance"
-   * (calculate a repayment 120s in the future)
-   */
-  const proration = getLoanProration(loan, 120);
-  return FixedPoint.mul(loan.repayment - loan.principal, toUnits(proration)) + loan.principal;
-}
-
-export function getMaxRepayment(principal: bigint, repayment: bigint) {
-  return principal + (10_500n * (repayment - principal)) / 10_000n;
-}

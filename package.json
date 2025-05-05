@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type": "tsc --noEmit"
   },
   "dependencies": {
     "@metastreet/sdk-v2": "0.15.1",

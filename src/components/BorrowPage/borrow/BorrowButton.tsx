@@ -1,14 +1,14 @@
 "use client";
 
+import { useWeb3, wagmiConfig } from "@/components/shared/Providers";
+import { POOL_ABI } from "@/lib/abis/Pool";
+import { getMaxRepayment } from "@/lib/borrow/calcs";
+import { BorrowOption } from "@/lib/borrow/getBorrowOptions";
+import { FixedPoint } from "@/lib/shared/utils";
+import { Pool } from "@/lib/subgraph/getPool";
 import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { Hash, encodePacked, erc721Abi, size } from "viem";
-import { POOL_ABI } from "../../lib/abis/Pool";
-import { BorrowOption } from "../../lib/getBorrowOptions";
-import { Pool } from "../../lib/subgraph/getPool";
-import { FixedPoint } from "../../lib/utils";
-import { getMaxRepayment } from "../Loans";
-import { useWeb3, wagmiConfig } from "../Providers";
 
 type BorrowButtonProps = {
   pool: Pool;

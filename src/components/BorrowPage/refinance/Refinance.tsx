@@ -1,7 +1,7 @@
+import { useBorrowData } from "@/lib/borrow/useBorrowData";
+import { Loan } from "@/lib/subgraph/getLoans";
+import { Pool } from "@/lib/subgraph/getPool";
 import { ReactNode, useState } from "react";
-import { Loan } from "../../lib/subgraph/getLoans";
-import { Pool } from "../../lib/subgraph/getPool";
-import { useBorrowData } from "../../lib/useBorrowData";
 import { BorrowTerms } from "../borrow/BorrowTerms";
 import { RefinanceButton } from "./RefinanceButton";
 

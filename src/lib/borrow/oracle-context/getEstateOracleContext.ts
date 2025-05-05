@@ -3,7 +3,7 @@
 import { sepolia } from "viem/chains";
 import { z } from "zod";
 import { GetOracleContextParams } from ".";
-import { zodAddress, zodHex, zodStringToNumber } from "../utils";
+import { zodAddress, zodHex, zodStringToNumber } from "../../shared/utils";
 import { encodeOracleContext, Quote } from "./encodeOracleContext";
 
 const schema = z

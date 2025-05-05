@@ -1,13 +1,13 @@
+import { POOL_ABI } from "@/lib/abis/Pool";
+import { getLoanProratedRepayment } from "@/lib/borrow/calcs";
+import { Loan } from "@/lib/subgraph/getLoans";
+import { Pool } from "@/lib/subgraph/getPool";
 import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { erc20Abi } from "viem";
 import { useReadContract } from "wagmi";
-import { POOL_ABI } from "../lib/abis/Pool";
-import { Loan } from "../lib/subgraph/getLoans";
-import { Pool } from "../lib/subgraph/getPool";
-import { FixedPoint, fromUnits, printNumber } from "../lib/utils";
-import { getLoanProratedRepayment } from "./Loans";
-import { useWeb3, wagmiConfig } from "./Providers";
+import { FixedPoint, fromUnits, printNumber } from "../../lib/shared/utils";
+import { useWeb3, wagmiConfig } from "../shared/Providers";
 
 type RepayButtonProps = {
   loan: Loan;

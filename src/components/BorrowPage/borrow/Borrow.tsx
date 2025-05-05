@@ -1,7 +1,7 @@
 "use client";
 
-import { useBorrowData } from "@/app/lib/useBorrowData";
-import { useSearchParamsMutation } from "@/app/lib/useSearchParamsMutation";
+import { useBorrowData } from "@/lib/borrow/useBorrowData";
+import { useSearchParamsMutation } from "@/lib/shared/useSearchParamsMutation";
 import { ReactNode, useState } from "react";
 import { isAddress } from "viem";
 import { BorrowButton } from "./BorrowButton";

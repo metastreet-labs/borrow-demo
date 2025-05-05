@@ -1,7 +1,7 @@
 import { LiquidityNode, TickRouter } from "@metastreet/sdk-v2";
-import { getLoanProration } from "../components/Loans";
-import { Loan } from "./subgraph/getLoans";
-import { Pool } from "./subgraph/getPool";
+import { Loan } from "../subgraph/getLoans";
+import { Pool } from "../subgraph/getPool";
+import { getLoanProration } from "./calcs";
 
 type GetBorrowOptionsParams = {
   pool: Pool; // MetaStreet pool

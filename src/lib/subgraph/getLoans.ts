@@ -3,7 +3,7 @@
 import { gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
-import { zodHex, zodStringToBigInt, zodStringToNumber } from "../utils";
+import { zodHex, zodStringToBigInt, zodStringToNumber } from "../shared/utils";
 import { getGQLClient } from "./graphqlClient";
 
 const LOANS_QUERY = gql`

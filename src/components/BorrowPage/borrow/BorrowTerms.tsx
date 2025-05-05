@@ -1,7 +1,7 @@
 "use client";
 
-import { BorrowOption } from "@/app/lib/getBorrowOptions";
-import { fromUnits, getDaysFromSeconds, printNumber } from "@/app/lib/utils";
+import { BorrowOption } from "@/lib/borrow/getBorrowOptions";
+import { fromUnits, getDaysFromSeconds, printNumber } from "@/lib/shared/utils";
 
 type BorrowTermsProps = {
   option: BorrowOption;

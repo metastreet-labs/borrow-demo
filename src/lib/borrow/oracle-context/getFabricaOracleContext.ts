@@ -1,7 +1,8 @@
 "use server";
 
+import { mainnet, sepolia } from "viem/chains";
 import { z } from "zod";
-import { zodAddress, zodHex, zodStringToNumber } from "../utils";
+import { zodAddress, zodHex } from "../../shared/utils";
 import type { Quote } from "./encodeOracleContext";
 import { encodeOracleContext } from "./encodeOracleContext";
 import type { GetOracleContextParams } from "./getOracleContext";
@@ -13,8 +14,8 @@ const schema = z
       tokenId: z.string(),
       currency: zodAddress,
       price: z.string(),
-      timestamp: zodStringToNumber,
-      duration: zodStringToNumber,
+      timestamp: z.number(),
+      duration: z.number(),
     }),
     signature: zodHex,
   })
@@ -25,12 +26,19 @@ const schema = z
     };
   });
 
-const BASE_URL = "https://api.price-oracle.dev.diamore.co/v1/metastreet/quotes";
+const BASE_URL = "https://api3.fabrica.land/meta-street";
 
-export async function getDiamoreOracleContext(params: GetOracleContextParams) {
-  const { collateralTokenId } = params;
+const CHAINS: Record<number, string> = {
+  [mainnet.id]: "mainnet",
+  [sepolia.id]: "sepolia",
+};
 
-  const response = await fetch(`${BASE_URL}/${collateralTokenId}`);
+export async function getFabricaOracleContext(params: GetOracleContextParams) {
+  const { chainId, pool, collateralToken, collateralTokenId } = params;
+
+  const response = await fetch(
+    `${BASE_URL}/${CHAINS[chainId]}/${pool}/${collateralToken}/${collateralTokenId}/signed-valuation`,
+  );
 
   const quote = schema.parse(await response.json());
 

@@ -1,17 +1,17 @@
 "use client";
 
 import { useWeb3, wagmiConfig } from "@/components/shared/Providers";
-import { SSPO_ABI } from "@/lib/abis/SimpleSignedPriceOracle";
-import { getBorrowOptions } from "@/lib/borrow/getBorrowOptions";
-import { getOracleContext } from "@/lib/borrow/oracle-context";
-import { FixedPoint } from "@/lib/shared/utils";
-import { Loan } from "@/lib/subgraph/getLoans";
-import { getPool, Pool } from "@/lib/subgraph/getPool";
 import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import * as devalue from "devalue";
 import { Address, isAddress, zeroAddress } from "viem";
 import { useBlockNumber } from "wagmi";
+import { SSPO_ABI } from "../abis/SimpleSignedPriceOracle";
+import { FixedPoint } from "../shared/utils";
+import { Loan } from "../subgraph/getLoans";
+import { Pool, getPool } from "../subgraph/getPool";
+import { getBorrowOptions } from "./getBorrowOptions";
+import { getOracleContext } from "./oracle-context";
 
 type UseBorrowOptionsParams = {
   pool: string | Pool;
