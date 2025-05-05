@@ -64,8 +64,6 @@ export function Borrow() {
 
   return (
     <div className="flex flex-col gap-2 mt-4">
-      <h2>Borrow</h2>
-
       <input
         value={poolAddress}
         onChange={(e) => sp.set("pool", e.target.value)}

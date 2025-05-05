@@ -2,6 +2,8 @@ import { Big } from "big.js";
 import { Address, Hex, formatUnits, isAddress, isHex, parseUnits } from "viem";
 import { z } from "zod";
 
+const ZERO = new Big(0);
+
 /* Fixed Point */
 
 const DECIMALS = 18;
@@ -38,6 +40,12 @@ export function fromUnits(u: bigint, decimals = DECIMALS) {
 export function toUnits(n: number | string | Big, decimals = DECIMALS) {
   return parseUnits(n.toString(), decimals);
 }
+
+export const fromInput = (input: string) => {
+  if (!input) return ZERO;
+  if (input === ".") return ZERO;
+  return new Big(input);
+};
 
 export function printNumber(n: Big) {
   return n.toFixed(3);
