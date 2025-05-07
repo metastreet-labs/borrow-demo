@@ -20,7 +20,7 @@ const POOL_QUERY = gql`
       collateralToken {
         id
       }
-      ticks {
+      ticks(where: { active: true }) {
         raw
         available
         value

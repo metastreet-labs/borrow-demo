@@ -1,3 +1,5 @@
+import { LendPage } from "@/components/LendPage";
+
 export default function Home() {
-  return <div>Lend</div>;
+  return <LendPage />;
 }
