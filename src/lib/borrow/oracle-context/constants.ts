@@ -22,6 +22,6 @@ export const SSPO_POOLS: Record<number, SimpleSignedPriceOraclePools> = {
       "0x62c2940cc4ab105cfda49bdabc3b7a9741ba9c9e", // CA-Only
     ],
     diamore: "0xb7227b964e381e8fed72d5a0a12d5d59b8802cd6",
-    estate: "0xbc97b2102af62728dfab56311b1d26666a347d83",
+    estate: "0x438d71b7d97a7e454882399308ec9cf9ee3a611e",
   },
 };
