@@ -1,11 +1,11 @@
+import { wagmiConfig } from "@/components/shared/Providers";
 import { POOL_ABI } from "@/lib/abis/Pool";
 import { FixedPoint } from "@/lib/shared/utils";
 import { readContract, waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { useState } from "react";
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
-import { wagmiConfig } from "../shared/Providers";
-import { usePool } from "./PoolProvider";
+import { usePool } from "../PoolProvider";
 
 interface UseDepositTransactionParams {
   tick: bigint;
