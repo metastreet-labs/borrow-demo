@@ -1,12 +1,13 @@
 "use client";
 
 import {
+  decodeTick,
   denormalizeTickRate,
   encodeTick,
   TickLimitType,
 } from "@/components/LendPage/tick/tickCodec";
 import { useSearchParamsMutation } from "@/lib/shared/useSearchParamsMutation";
-import { fromInput, toUnits } from "@/lib/shared/utils";
+import { fromInput, fromUnits, printNumber, toUnits } from "@/lib/shared/utils";
 import { getPool } from "@/lib/subgraph/getPool";
 import { useQuery } from "@tanstack/react-query";
 import { ReactNode, useMemo, useState } from "react";
@@ -115,66 +116,118 @@ function Lend() {
   const isDepositButtonDisabled =
     !selectedLimit || isLimitInvalid || !amountUnits || isBalanceInsufficient || isLoading;
 
+  function printRate(rate: bigint) {
+    return `${Math.round(denormalizeTickRate(rate) * 100)}%`;
+  }
+
+  function printDuration(duration: number) {
+    return `${Math.round(duration / 86400)}d`;
+  }
+
+  function printLimit(limit: bigint, limitType: TickLimitType) {
+    if (limitType == TickLimitType.Absolute) return `${printNumber(fromUnits(limit))} ${symbol}`;
+    else return `${Number(limit) / 100}% LTV`;
+  }
+
   return (
-    <div className="flex flex-col">
-      <span className="font-semibold">Select duration</span>
-      <div className="flex flex-wrap w-64 gap-1">
-        {durations.map((duration, idx) => {
-          return (
+    <div className="flex flex-col items-center">
+      <div className="flex gap-8">
+        <div className="flex flex-col">
+          <span className="font-semibold">Select duration</span>
+          <div className="flex flex-wrap w-64 gap-1">
+            {durations.map((duration, idx) => {
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedDurationIdx(idx)}
+                  className={`p-1 border ${selectedDurationIdx == idx ? "bg-blue-500" : ""}`}
+                >
+                  {printDuration(duration)}
+                </button>
+              );
+            })}
+          </div>
+
+          <span className="font-semibold mt-4">Select rate</span>
+          <div className="flex flex-wrap w-64 gap-1">
+            {rates.map((rate, idx) => {
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedRateIdx(idx)}
+                  className={`p-1 border ${selectedRateIdx == idx ? "bg-blue-500" : ""}`}
+                >
+                  {printRate(rate)}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-2 mt-4 mb-2">
+            <span className="font-semibold">Enter Loan Limit</span>
+
             <button
-              key={idx}
-              onClick={() => setSelectedDurationIdx(idx)}
-              className={`p-1 border ${selectedDurationIdx == idx ? "bg-blue-500" : ""}`}
+              className={`p-1 border ${selectedLimitType == TickLimitType.Absolute ? "bg-blue-500" : ""}`}
+              onClick={() => setSelectedLimitType(TickLimitType.Absolute)}
             >
-              {Math.round(duration / 86400)}d
+              Absolute
             </button>
-          );
-        })}
-      </div>
 
-      <span className="font-semibold mt-4">Select rate</span>
-      <div className="flex flex-wrap w-64 gap-1">
-        {rates.map((rate, idx) => {
-          return (
             <button
-              key={idx}
-              onClick={() => setSelectedRateIdx(idx)}
-              className={`p-1 border ${selectedRateIdx == idx ? "bg-blue-500" : ""}`}
+              className={`p-1 border ${selectedLimitType == TickLimitType.Ratio ? "bg-blue-500" : ""}`}
+              onClick={() => setSelectedLimitType(TickLimitType.Ratio)}
             >
-              {Math.round(denormalizeTickRate(rate) * 100)}%
+              Ratio
             </button>
-          );
-        })}
+          </div>
+
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              className="w-36"
+              value={_selectedLimit}
+              onChange={(e) => _setSelectedLimit(e.target.value)}
+            />
+            <span>{selectedLimitType == TickLimitType.Absolute ? symbol : "% LTV"}</span>
+          </div>
+          {isLimitInvalid && <span className="text-red-500">Invalid limit</span>}
+        </div>
+
+        <span className="font-bold">OR</span>
+
+        <div className="flex flex-col">
+          <span className="font-semibold">Select existing tick</span>
+
+          <div className="flex flex-col gap-2">
+            {ticks.map((tick, idx) => {
+              const { limit, limitType, rateIndex, durationIndex } = decodeTick(tick.raw);
+
+              const isSelected = selectedTick == tick.raw;
+
+              return (
+                <button
+                  key={idx}
+                  className={`p-1 border ${isSelected ? "bg-blue-500" : ""}`}
+                  onClick={() => {
+                    setSelectedDurationIdx(durationIndex);
+                    setSelectedRateIdx(rateIndex);
+                    setSelectedLimitType(limitType);
+
+                    const limitStr =
+                      limitType == TickLimitType.Absolute
+                        ? fromUnits(limit).toString()
+                        : `${Number(limit) / 100}`;
+                    _setSelectedLimit(limitStr);
+                  }}
+                >
+                  {printLimit(limit, limitType)}, {printRate(rates[rateIndex])},{" "}
+                  {printDuration(durations[durationIndex])}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
-
-      <div className="flex items-center gap-2 mt-4 mb-2">
-        <span className="font-semibold">Enter Loan Limit</span>
-
-        <button
-          className={`p-1 border ${selectedLimitType == TickLimitType.Absolute ? "bg-blue-500" : ""}`}
-          onClick={() => setSelectedLimitType(TickLimitType.Absolute)}
-        >
-          Absolute
-        </button>
-
-        <button
-          className={`p-1 border ${selectedLimitType == TickLimitType.Ratio ? "bg-blue-500" : ""}`}
-          onClick={() => setSelectedLimitType(TickLimitType.Ratio)}
-        >
-          Ratio
-        </button>
-      </div>
-
-      <div className="flex items-center gap-1">
-        <input
-          type="number"
-          className="w-36"
-          value={_selectedLimit}
-          onChange={(e) => _setSelectedLimit(e.target.value)}
-        />
-        <span>{selectedLimitType == TickLimitType.Absolute ? symbol : "% LTV"}</span>
-      </div>
-      {isLimitInvalid && <span className="text-red-500">Invalid limit</span>}
 
       <span className="mt-4 font-semibold">Enter amount to lend</span>
       <div className="flex items-center gap-1">

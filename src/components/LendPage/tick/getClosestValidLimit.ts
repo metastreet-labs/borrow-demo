@@ -1,3 +1,4 @@
+import Big from "big.js";
 import { find, findLast } from "lodash";
 import { decodeTick, TickLimitType } from "./tickCodec";
 
@@ -24,7 +25,10 @@ export function getClosestValidLimit(params: GetClosestValidLimitParams) {
 
   const space = (l: bigint) => applySpacing(l, limitType);
 
-  const ticks = allTicks.map(decodeTick).filter((t) => t.limitType == limitType);
+  const ticks = [...allTicks]
+    .sort((a, b) => (new Big(a.toString()).minus(b.toString()).lt(0) ? -1 : 1))
+    .map(decodeTick)
+    .filter((t) => t.limitType == limitType);
 
   const prevTick = findLast(ticks, (t) => t.limit <= limit);
   const nextTick = find(ticks, (t) => t.limit >= limit);
