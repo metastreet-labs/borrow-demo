@@ -1,5 +1,5 @@
 import { Big } from "big.js";
-import { Address, Hex, formatUnits, isAddress, isHex, parseUnits } from "viem";
+import { Address, Hash, Hex, formatUnits, isAddress, isHash, isHex, parseUnits } from "viem";
 import { z } from "zod";
 
 const ZERO = new Big(0);
@@ -66,6 +66,11 @@ export const zodHex = z
   .string()
   .refine(isHex)
   .transform((s) => s as Hex);
+
+export const zodHash = z
+  .string()
+  .refine(isHash)
+  .transform((s) => s as Hash);
 
 export const zodStringToBigInt = z.string().transform((s) => BigInt(s));
 

@@ -1,10 +1,11 @@
-import { fromInput, fromUnits, printNumber, toUnits } from "@/lib/shared/utils";
+import { fromInput, fromUnits, toUnits } from "@/lib/shared/utils";
 import { useMemo, useState } from "react";
 import { erc20Abi } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import { usePool } from "../PoolProvider";
 import { getClosestValidLimit } from "../tick/getClosestValidLimit";
-import { decodeTick, denormalizeTickRate, encodeTick, TickLimitType } from "../tick/tickCodec";
+import { decodeTick, encodeTick, TickLimitType } from "../tick/tickCodec";
+import { printDuration, printLimit, printRate } from "../utils";
 import { useDepositTx } from "./useDepositTx";
 
 export function Deposit() {
@@ -62,21 +63,10 @@ export function Deposit() {
   const isDepositButtonDisabled =
     !selectedLimit || isLimitInvalid || !amountUnits || isBalanceInsufficient || isLoading;
 
-  function printRate(rate: bigint) {
-    return `${Math.round(denormalizeTickRate(rate) * 100)}%`;
-  }
-
-  function printDuration(duration: number) {
-    return `${Math.round(duration / 86400)}d`;
-  }
-
-  function printLimit(limit: bigint, limitType: TickLimitType) {
-    if (limitType == TickLimitType.Absolute) return `${printNumber(fromUnits(limit))} ${symbol}`;
-    else return `${Number(limit) / 100}% LTV`;
-  }
-
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center p-4 border rounded-lg">
+      <h3 className="text-xl font-bold self-start">Deposit</h3>
+
       <div className="flex gap-8">
         <div className="flex flex-col">
           <span className="font-semibold">Select duration</span>
@@ -166,7 +156,7 @@ export function Deposit() {
                     _setSelectedLimit(limitStr);
                   }}
                 >
-                  {printLimit(limit, limitType)}, {printRate(rates[rateIndex])},{" "}
+                  {printLimit(limit, limitType, symbol)}, {printRate(rates[rateIndex])},{" "}
                   {printDuration(durations[durationIndex])}
                 </button>
               );

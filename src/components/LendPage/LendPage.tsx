@@ -8,6 +8,7 @@ import { isAddress } from "viem";
 import { useChainId } from "wagmi";
 import { Deposit } from "./Deposit/Deposit";
 import { PoolProvider } from "./PoolProvider";
+import { Positions } from "./Positions/Positions";
 
 export function LendPage() {
   const chainId = useChainId();
@@ -36,18 +37,22 @@ export function LendPage() {
     child = (
       <PoolProvider pool={data}>
         <Deposit />
+        <Positions />
       </PoolProvider>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      <input
-        value={poolAddress ?? ""}
-        onChange={(e) => sp.set("pool", e.target.value)}
-        placeholder="Pool address"
-        className="mb-4"
-      />
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center gap-4 ">
+        <span>Pool address</span>
+        <input
+          value={poolAddress ?? ""}
+          onChange={(e) => sp.set("pool", e.target.value)}
+          placeholder="Pool address"
+          className="flex-grow"
+        />
+      </div>
       {child}
     </div>
   );
