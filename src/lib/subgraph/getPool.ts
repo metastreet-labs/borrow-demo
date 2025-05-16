@@ -1,8 +1,9 @@
 "use server";
 
 import { gql } from "graphql-request";
-import { Address, zeroAddress } from "viem";
+import { Address, isAddressEqual, zeroAddress } from "viem";
 import { z } from "zod";
+import { COLLATERAL_WRAPPERS } from "../borrow/collateral-wrappers";
 import { zodAddress, zodStringToBigInt } from "../shared/utils";
 import { getGQLClient } from "./graphqlClient";
 
@@ -20,6 +21,7 @@ const POOL_QUERY = gql`
       collateralToken {
         id
       }
+      collateralWrappers
       ticks(where: { active: true }) {
         raw
         available
@@ -44,6 +46,7 @@ const POOL_SCHEMA = z.object({
   collateralToken: z.object({
     id: zodAddress,
   }),
+  collateralWrappers: z.array(zodAddress),
   ticks: z.array(
     z.object({
       raw: zodStringToBigInt,
@@ -56,7 +59,7 @@ const POOL_SCHEMA = z.object({
   externalPriceOracle: zodAddress.nullable().transform((a) => a ?? zeroAddress),
 });
 
-export type Pool = z.infer<typeof POOL_SCHEMA>;
+export type Pool = Awaited<ReturnType<typeof getPool>>;
 
 type GetPoolParams = {
   chainId: number;
@@ -66,5 +69,12 @@ type GetPoolParams = {
 export async function getPool(params: GetPoolParams) {
   const { chainId, poolAddress } = params;
   const response = await getGQLClient(chainId).request<any>(POOL_QUERY, { id: poolAddress });
-  return POOL_SCHEMA.parse(response.pool);
+  const pool = POOL_SCHEMA.parse(response.pool);
+
+  return {
+    ...pool,
+    isERC1155Pool: pool.collateralWrappers.some((cw) =>
+      isAddressEqual(cw, COLLATERAL_WRAPPERS[chainId].erc1155),
+    ),
+  };
 }

@@ -6,13 +6,14 @@ import { getLoanProration } from "./calcs";
 type GetBorrowOptionsParams = {
   pool: Pool; // MetaStreet pool
   collateralValue: bigint; // value returned by `price()` function of the oracle contract
+  multiplier: number;
   loan?: Loan; // in case of refinance
 };
 
 export type BorrowOption = ReturnType<typeof getBorrowOptions>[number];
 
 export function getBorrowOptions(params: GetBorrowOptionsParams) {
-  const { pool, loan, collateralValue } = params;
+  const { pool, loan, collateralValue, multiplier } = params;
 
   /* Construct a tick router */
   const router = new TickRouter(pool.durations, pool.rates);
@@ -22,9 +23,6 @@ export function getBorrowOptions(params: GetBorrowOptionsParams) {
 
   /* get a borrow option for each pool duration */
   return pool.durations.map((duration) => {
-    /* borrowing against 1 NFT */
-    const multiplier = 1;
-
     /* get maximum principal for this duration */
     const maxPrincipal = router.forecast(liquidityNodes, duration, multiplier, collateralValue);
 

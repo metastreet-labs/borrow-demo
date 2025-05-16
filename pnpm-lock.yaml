@@ -20,6 +20,9 @@ importers:
       '@wagmi/core':
         specifier: 2.9.1
         version: 2.9.1(@tanstack/query-core@5.35.1)(@types/react@18.3.1)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(viem@2.9.32(bufferutil@4.0.8)(typescript@5.4.5)(zod@3.23.6))(zod@3.23.6)
+      abitype:
+        specifier: 1.0.8
+        version: 1.0.8(typescript@5.4.5)(zod@3.23.6)
       big.js:
         specifier: 6.2.1
         version: 6.2.1

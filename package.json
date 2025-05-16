@@ -14,6 +14,7 @@
     "@rainbow-me/rainbowkit": "2.0.6",
     "@tanstack/react-query": "5.35.1",
     "@wagmi/core": "2.9.1",
+    "abitype": "1.0.8",
     "big.js": "6.2.1",
     "date-fns": "4.1.0",
     "devalue": "5.0.0",

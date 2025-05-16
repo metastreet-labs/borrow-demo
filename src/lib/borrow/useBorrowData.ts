@@ -16,6 +16,7 @@ import { getOracleContext } from "./oracle-context";
 type UseBorrowOptionsParams = {
   pool: string | Pool;
   tokenId: string;
+  quantity: number;
   loan?: Loan;
 };
 
@@ -33,12 +34,17 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
         pool: poolAddressOrObject,
         tokenId,
         loan,
+        quantity,
       } = devalue.parse(stringifiedParams) as UseBorrowOptionsParams;
 
       const pool =
         typeof poolAddressOrObject == "string"
           ? await getPool({ chainId, poolAddress: poolAddressOrObject as Address })
           : poolAddressOrObject;
+
+      if (!pool.isERC1155Pool && quantity != 1) {
+        throw new Error("Quantity must be 1 for non-ERC1155 pools");
+      }
 
       const oracleContext = await getOracleContext({
         chainId,
@@ -58,7 +64,7 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
                 pool.collateralToken.id,
                 pool.currencyToken.id,
                 [BigInt(tokenId)],
-                [1n],
+                [BigInt(quantity)],
                 oracleContext,
               ],
             });
@@ -71,6 +77,7 @@ export function useBorrowData(params: UseBorrowOptionsParams) {
           price,
           FixedPoint.DECIMALS - pool.currencyToken.decimals,
         ),
+        multiplier: quantity,
       }).filter((o) => o.principal != o.repayment);
 
       return { borrowOptions, pool, oracleContext };

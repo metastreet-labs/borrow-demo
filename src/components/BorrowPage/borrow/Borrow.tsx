@@ -12,8 +12,9 @@ export function Borrow() {
 
   const poolAddress = sp.get("pool") ?? "";
   const tokenId = sp.get("tokenId") ?? "";
+  const quantity = sp.get("quantity") ?? "1";
 
-  const { data, error } = useBorrowData({ pool: poolAddress, tokenId });
+  const { data, error } = useBorrowData({ pool: poolAddress, tokenId, quantity: Number(quantity) });
   console.log({ data, error });
 
   const [selectedBorrowOptionIndex, setSelectedBorrowOptionIndex] = useState(0);
@@ -55,6 +56,7 @@ export function Borrow() {
         <BorrowButton
           pool={data.pool}
           tokenId={tokenId}
+          quantity={data.pool.isERC1155Pool ? Number(quantity) : 1}
           borrowOption={data.borrowOptions[selectedBorrowOptionIndex]}
           oracleContext={data.oracleContext}
         />
@@ -70,12 +72,29 @@ export function Borrow() {
         placeholder="Pool address"
       />
 
-      <input
-        type="number"
-        value={tokenId}
-        onChange={(e) => sp.set("tokenId", e.target.value)}
-        placeholder="Token id"
-      />
+      <div className="flex gap-4">
+        <div className="flex flex-col grow">
+          <span>Token id</span>
+          <input
+            type="number"
+            value={tokenId}
+            onChange={(e) => sp.set("tokenId", e.target.value)}
+            placeholder="Token id"
+          />
+        </div>
+
+        <div className="flex flex-col w-44">
+          <span>Quantity</span>
+          <input
+            type="number"
+            value={data?.pool.isERC1155Pool ? quantity : "1"}
+            onChange={(e) => sp.set("quantity", e.target.value)}
+            placeholder="Quantity"
+            disabled={!data?.pool.isERC1155Pool}
+            min={1}
+          />
+        </div>
+      </div>
 
       <div className="flex gap-4 items-start">
         <div className="flex flex-col gap-4">{borrowOptionsNode}</div>
