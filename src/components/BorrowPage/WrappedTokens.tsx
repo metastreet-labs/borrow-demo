@@ -99,11 +99,12 @@ function WrappedTokenCard(props: Props) {
   );
 }
 
-export function useUnwrapToken(wrappedToken: WrappedToken) {
+export function useUnwrapToken(wrappedToken: WrappedToken | null) {
   const { connectedWalletAddress, chainId } = useWeb3();
   const cw = COLLATERAL_WRAPPERS[chainId];
 
   return async function unwrapToken() {
+    if (!wrappedToken) throw new Error("No wrapped token");
     if (!connectedWalletAddress) throw new Error("Not connected");
 
     const isApproved = await readContract(wagmiConfig, {

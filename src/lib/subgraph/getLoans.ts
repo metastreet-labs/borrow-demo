@@ -3,6 +3,7 @@
 import { gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
+import { extractBatchQuantities } from "../shared/extractBatchQuantities";
 import { zodHex, zodStringToBigInt, zodStringToNumber } from "../shared/utils";
 import { getGQLClient } from "./graphqlClient";
 
@@ -20,6 +21,11 @@ const LOANS_QUERY = gql`
       ticks
       useds
       interests
+      batch {
+        id
+        collateralWrapperContext
+        underlyingCollateralTokenIds
+      }
     }
   }
 `;
@@ -37,10 +43,17 @@ const LOANS_SCHEMA = z.array(
     ticks: z.array(zodStringToBigInt),
     useds: z.array(zodStringToBigInt),
     interests: z.array(zodStringToBigInt),
+    batch: z
+      .object({
+        id: zodStringToBigInt,
+        collateralWrapperContext: zodHex,
+        underlyingCollateralTokenIds: z.array(zodStringToBigInt),
+      })
+      .nullable(),
   }),
 );
 
-export type Loan = z.infer<typeof LOANS_SCHEMA>[number];
+export type Loan = Awaited<ReturnType<typeof getLoans>>[number];
 
 type GetLoansParams = {
   chainId: number;
@@ -50,6 +63,14 @@ type GetLoansParams = {
 
 export async function getLoans(params: GetLoansParams) {
   const { chainId, ...variables } = params;
+
   const response = await getGQLClient(chainId).request<any>(LOANS_QUERY, variables);
-  return LOANS_SCHEMA.parse(response.loans);
+  const loans = LOANS_SCHEMA.parse(response.loans);
+
+  return loans.map((l) => ({
+    ...l,
+    batch: l.batch
+      ? { ...l.batch, quantities: extractBatchQuantities(l.batch.collateralWrapperContext) }
+      : null,
+  }));
 }

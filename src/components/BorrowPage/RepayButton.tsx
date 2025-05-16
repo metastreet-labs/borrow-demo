@@ -8,6 +8,7 @@ import { erc20Abi } from "viem";
 import { useReadContract } from "wagmi";
 import { FixedPoint, fromUnits, printNumber } from "../../lib/shared/utils";
 import { useWeb3, wagmiConfig } from "../shared/Providers";
+import { useUnwrapToken } from "./WrappedTokens";
 
 type RepayButtonProps = {
   loan: Loan;
@@ -40,6 +41,8 @@ export function RepayButton(props: RepayButtonProps) {
 
   const isBalanceInsufficient = balance != undefined && balance < repayment;
 
+  const _unwrap = useUnwrapToken(loan.batch);
+
   async function _repay() {
     if (!connectedWalletAddress) return;
 
@@ -69,6 +72,8 @@ export function RepayButton(props: RepayButtonProps) {
       args: [loan.loanReceipt],
     });
     await waitForTransactionReceipt(wagmiConfig, { hash });
+
+    if (loan.batch) await _unwrap();
   }
 
   const [isLoading, setIsLoading] = useState(false);

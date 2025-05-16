@@ -13,7 +13,10 @@ type RefinanceProps = {
 export function Refinance(props: RefinanceProps) {
   const { loan, pool } = props;
 
-  const { data, error } = useBorrowData({ pool, tokenId: `${loan.collateralTokenIds[0]}`, loan });
+  const tokenId = `${loan.collateralTokenIds[0]}`;
+  const quantity = Number(loan.batch?.quantities[0]);
+
+  const { data, error } = useBorrowData({ pool, tokenId, quantity, loan });
 
   const [selectedBorrowOptionIndex, setSelectedBorrowOptionIndex] = useState(0);
 

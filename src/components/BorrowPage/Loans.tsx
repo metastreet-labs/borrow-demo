@@ -90,15 +90,28 @@ type LoanItemProps = {
 function LoanItem(props: LoanItemProps) {
   const { loan, onClick, selected } = props;
 
+  let collateral;
+  if (loan.batch) {
+    const { quantities, underlyingCollateralTokenIds } = loan.batch;
+    collateral = underlyingCollateralTokenIds.map((id, idx) => (
+      <li key={idx}>{`${quantities[idx]} x ${id}`}</li>
+    ));
+  } else {
+    collateral = loan.collateralTokenIds.map((id, idx) => <li key={idx}>{`${id}`}</li>);
+  }
+
   return (
     <div
-      className={`flex flex-col border p-2 ${selected ? "border-purple-400 border-2" : ""}`}
+      className={`flex flex-col border p-2 w-96 ${selected ? "border-purple-400 border-2" : ""}`}
       key={loan.id}
       role="button"
       tabIndex={0}
       onClick={() => onClick()}
     >
-      <span>Collateral: {loan.collateralTokenIds.join()}</span>
+      <div className="flex flex-col gap-1">
+        <span>Collateral:</span>
+        <ul className="flex flex-col gap-1 list-disc list-inside [&>li]:truncate">{collateral}</ul>
+      </div>
       <span>Maturity: {new Date(loan.maturity * 1000).toLocaleString()}</span>
       <span>Repayment at maturity: {printNumber(fromUnits(loan.repayment))}</span>
       <span>Repayment now: {printNumber(fromUnits(getLoanProratedRepayment(loan)))}</span>
