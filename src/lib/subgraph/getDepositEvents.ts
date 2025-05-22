@@ -8,7 +8,7 @@ import { getGQLClient } from "./graphqlClient";
 
 const DEPOSIT_EVENTS_QUERY = gql`
   query DepositEvents($deposit: String!) {
-    poolEvents(where: { deposit: $deposit }) {
+    poolEvents(where: { deposit: $deposit }, orderBy: timestamp, orderDirection: desc) {
       transactionHash
       deposited {
         amount

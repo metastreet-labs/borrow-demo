@@ -8,6 +8,7 @@ import { decodeTick } from "../tick/tickCodec";
 import { printDuration, printLimit, printRate } from "../utils";
 import { DepositProvider } from "./DepositProvider";
 import { PositionEvents } from "./PositionEvents";
+import { Rebalance } from "./Rebalance";
 import { Redeem } from "./Redeem";
 import { useRedemptionsProgress } from "./redemptions";
 import { Withdraw } from "./Withdraw";
@@ -82,6 +83,7 @@ export function Positions() {
           <div className="flex flex-col gap-2 flex-grow">
             <Redeem />
             <Withdraw />
+            <Rebalance />
           </div>
         </div>
       </DepositProvider>
