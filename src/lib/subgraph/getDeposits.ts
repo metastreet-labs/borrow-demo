@@ -14,8 +14,14 @@ const DEPOSITS_QUERY = gql`
       pool {
         id
         currencyToken {
+          id
           symbol
           decimals
+        }
+        durations
+        rates
+        ticks {
+          raw
         }
       }
       tick {
@@ -36,9 +42,17 @@ const DEPOSITS_SCHEMA = z.array(
     pool: z.object({
       id: zodAddress,
       currencyToken: z.object({
+        id: zodAddress,
         symbol: z.string(),
         decimals: z.number(),
       }),
+      durations: z.array(z.string().transform((s) => Number(s))),
+      rates: z.array(zodStringToBigInt),
+      ticks: z.array(
+        z.object({
+          raw: zodStringToBigInt,
+        }),
+      ),
     }),
     tick: z.object({
       raw: zodStringToBigInt,
