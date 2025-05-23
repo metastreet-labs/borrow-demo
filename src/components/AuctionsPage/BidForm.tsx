@@ -1,6 +1,6 @@
 import { EACL_ABI } from "@/lib/abis/EACL";
 import { FixedPoint, fromInput, fromUnits, printNumber, toUnits } from "@/lib/shared/utils";
-import { Auction } from "@/lib/subgraph/getAuctions";
+import { Auction } from "@/lib/subgraph/auctions";
 import { useState } from "react";
 import { erc20Abi } from "viem";
 import { useAccount, useChainId, useReadContract } from "wagmi";

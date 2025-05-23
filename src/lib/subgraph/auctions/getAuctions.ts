@@ -3,8 +3,8 @@
 import { gql } from "graphql-request";
 import { Address } from "viem";
 import { z } from "zod";
-import { zodAddress, zodHex, zodStringToBigInt, zodStringToNumber } from "../shared/utils";
-import { getGQLClient } from "./graphqlClient";
+import { getGQLClient } from "../graphqlClient";
+import { AUCTION_SCHEMA } from "./schema";
 
 const AUCTIONS_QUERY = gql`
   query Auctions($collection: String!) {
@@ -30,39 +30,12 @@ const AUCTIONS_QUERY = gql`
         bidder
       }
       endTime
+      status
     }
   }
 `;
 
-const AUCTIONS_SCHEMA = z.array(
-  z.object({
-    id: zodHex,
-    liquidation: z.object({
-      id: zodHex,
-      loan: z.object({
-        loanReceipt: zodHex,
-      }),
-    }),
-    collateralToken: z.object({
-      id: zodAddress,
-    }),
-    currencyToken: z.object({
-      id: zodAddress,
-      symbol: z.string(),
-      decimals: z.number(),
-    }),
-    collateralTokenId: zodStringToBigInt,
-    highestBid: z
-      .object({
-        amount: zodStringToBigInt,
-        bidder: zodAddress,
-      })
-      .nullable(),
-    endTime: zodStringToNumber,
-  }),
-);
-
-export type Auction = z.infer<typeof AUCTIONS_SCHEMA>[number];
+export type Auction = z.infer<typeof AUCTION_SCHEMA>;
 
 type GetAuctionsParams = {
   chainId: number;
@@ -72,5 +45,5 @@ type GetAuctionsParams = {
 export async function getAuctions(params: GetAuctionsParams) {
   const { chainId, ...variables } = params;
   const response = await getGQLClient(chainId).request<any>(AUCTIONS_QUERY, variables);
-  return AUCTIONS_SCHEMA.parse(response.auctions);
+  return z.array(AUCTION_SCHEMA).parse(response.auctions);
 }

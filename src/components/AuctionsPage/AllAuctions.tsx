@@ -2,36 +2,52 @@
 
 import { useSearchParamsMutation } from "@/lib/shared/useSearchParamsMutation";
 import { fromUnits, printNumber } from "@/lib/shared/utils";
-import { Auction } from "@/lib/subgraph/auctions";
+import { Auction, getAuctions } from "@/lib/subgraph/auctions/getAuctions";
+import { useQuery } from "@tanstack/react-query";
 import { getUnixTime } from "date-fns";
 import { clamp } from "lodash";
 import { ReactNode } from "react";
-import { useAccount } from "wagmi";
-import { AccountAuctions } from "./AccountAuctions";
-import { AllAuctions } from "./AllAuctions";
+import { isAddress, isAddressEqual } from "viem";
+import { useAccount, useChainId } from "wagmi";
 import { BidForm } from "./BidForm";
 import { ClaimButton } from "./ClaimButton";
 
-export function AuctionsPage() {
+export function AllAuctions() {
+  const chainId = useChainId();
+
   const sp = useSearchParamsMutation();
   const collection = sp.get("collection");
 
+  const { data: auctions, error: auctionsError } = useQuery({
+    queryKey: ["auctions", chainId, collection] as const,
+    queryFn: ({ queryKey }) => {
+      const [, chainId, collection] = queryKey;
+      if (!collection || !isAddress(collection)) throw new Error("Invalid collection address");
+      return getAuctions({ chainId, collection });
+    },
+    enabled: !!collection && isAddress(collection),
+  });
+
+  let child: ReactNode;
+  if (!auctions) {
+    if (auctionsError) child = <span className="text-red-500">{auctionsError.message}</span>;
+    else child = <span className="text-gray-500">Loading...</span>;
+  } else {
+    if (!auctions.length) child = <span className="text-gray-500">No auctions found</span>;
+    else
+      child = (
+        <div className="flex flex-col gap-4">
+          {auctions.map((auction) => {
+            return <AuctionCard key={auction.id} auction={auction} />;
+          })}
+        </div>
+      );
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4 items-center">
-        <span className="font-bold">Collection</span>
-        <input
-          value={collection ?? ""}
-          onChange={(e) => sp.set("collection", e.target.value)}
-          placeholder="Collection address"
-          className="flex-grow"
-        />
-      </div>
-
-      <div className="flex gap-8">
-        <AllAuctions />
-        <AccountAuctions />
-      </div>
+      <span className="text-lg font-bold">All Auctions</span>
+      {child}
     </div>
   );
 }
@@ -59,7 +75,7 @@ function AuctionCard({ auction }: { auction: Auction }) {
       </div>
     );
   } else {
-    if (highestBid?.bidder === account) {
+    if (highestBid && account && isAddressEqual(highestBid.bidder, account)) {
       action = (
         <div className="flex gap-2">
           <span>You won the auction</span>

@@ -1,5 +1,5 @@
 import { EACL_ABI } from "@/lib/abis/EACL";
-import { Auction } from "@/lib/subgraph/getAuctions";
+import { Auction } from "@/lib/subgraph/auctions";
 import { useState } from "react";
 import { useChainId } from "wagmi";
 import { waitForTransactionReceipt, writeContract } from "wagmi/actions";
